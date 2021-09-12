@@ -25,4 +25,10 @@ int main()
     cout << "result was == " << res0 << " , expected == " << e0 << endl;
     cout << "result was == " << res1 << " , expected == " << e1 << endl;
     cout << "result was == " << res2 << " , expected == " << e2 << endl;
+
+
+    auto newres0 = rc.intToRoman(1994);
+    auto newe0 = "MCMXCIV";
+
+    cout << " result was == " << newres0 << " expected == " << newe0 << endl;
 }
