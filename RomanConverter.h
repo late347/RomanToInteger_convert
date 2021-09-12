@@ -75,41 +75,22 @@ public:
 	XX				20
 
 	*/
+
 	RomanConverter() = default;
 
 	std::string intToRoman(int num)
 	{
-		std::map<int, std::string> ArabicvalueToRomans
-		{
-			{1000, "M"},
-			{900, "CM"},
-			{500, "D"},
-			{400, "CD"},
-			{100, "C"},
-			{90, "XC"},
-			{50, "L"},
-			{40, "XL"},
-			{10, "X"},
-			{9, "IX"},
-			{8, "VIII"},
-			{7, "VII"},
-			{6, "VI"},
-			{5, "V"},
-			{4, "IV"},
-			{3, "III"},
-			{2, "II"},
-			{1, "I"}
-		};
 
-		std::vector<int> romanSpecials{ 1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 8,7,6,5,4,3,2,1 };
 
+		/*char buf[101] = { 0 };
+		char letters[5] = { 0 };*/
 		int arabic = num;
 		std::string result = "";
+		result.reserve(50);
 		while (arabic > 0)
 		{
-			int d = seekLargestPossible(romanSpecials, arabic);
-			int r = arabic % d;
-			std::string characters = processToRoman(d, ArabicvalueToRomans);
+			int d = seekLargestPossible(arabic);
+			std::string characters = processToRoman(d);
 			arabic -= d;
 			result += characters;
 		}
@@ -118,54 +99,6 @@ public:
 
 
 	// gets the integer value from properly formatted roman value string
-	int romanToInt(std::string s)
-	{
-		int romanSum = 0;
-
-		// special case can be done with switch case
-		if (s.size() == 1)
-		{
-			return (oneSizeRomans(s[0]));
-		}
-
-		std::stack<int> thestack;
-
-		// intiialize stack to 1 element == 0
-		// to help in calculations
-		// so that the first stack.top() returns 0
-		thestack.push(0);
-
-		// iterate in reverse thru romanchars
-		// get current value of char
-		// curchar
-		//		'i'
-		//		if the nextchar is biggerorsame in value to curchar add that value and advance
-		//		if the nextchar is smaller and defined, subtract that value and advance
-		//
-		//		can use a stack to push the curchar into stack and that way you know latest addedValue to romanSum
-		int nextVal = 0;
-		int i = s.length() - 1;
-		while (i >= 0)
-		{
-			char current = s[i];
-			int curVal = oneSizeRomans(current);
-			// compoare stack top to currrent and decide
-			int stacked = thestack.top();
-			if (curVal >= stacked)
-			{
-				romanSum += curVal;
-			}
-			else
-			{
-				romanSum -= curVal;
-			}
-
-			thestack.push(curVal);
-			i--;
-		}
-
-		return romanSum;
-	}
 
 
 	int fasterRomanToInt(std::string s)
@@ -197,59 +130,30 @@ public:
 			return romanSum;
 		}
 	}
+
 private:
 
-	int seekLargestPossible(std::map<int, std::string>& mapRef, int a)
-	{
 
+	int seekLargestPossible(int a)
+	{
+		constexpr int romanSpecials[] = { 1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 8,7,6,5,4,3,2,1 };
 		// input bigger than biggest divisor so use 1000
 		if (a >= 1000)
 		{
 			return 1000;
 		}
 
-		//// find exact divisor match
-		//auto exact = mapRef.find(a);
-		//if (exact != mapRef.end())
-		//{
-		//	return exact->first;
-		//}
-
-
 		// seek the biggest divisor that is smallerorequal than the A inputvalue
-		// iterate in reversed because keys were sorted ascending in regular map
-		for (auto iter = mapRef.rbegin(); iter != mapRef.rend(); iter++)
+		
+		for(size_t i = 0; i<18; ++i)
 		{
-			int key = iter->first;
+			auto key = romanSpecials[i];
 			if (key <= a)
 			{
 				return key;
 			}
 		}
-		throw "something went bad in seekLargestPossible";
-	}
 
-	int seekLargestPossible(std::vector<int>& vecRef, int a)
-	{
-
-		// input bigger than biggest divisor so use 1000
-		if (a >= 1000)
-		{
-			return 1000;
-		}
-
-
-
-		// seek the biggest divisor that is smallerorequal than the A inputvalue
-		// iterate in reversed because keys were sorted ascending in regular map
-		for (auto iter = vecRef.begin(); iter != vecRef.end(); iter++)
-		{
-			auto key = *(iter);
-			if (key <= a)
-			{
-				return key;
-			}
-		}
 		throw "something went bad in seekLargestPossible";
 	}
 
@@ -270,9 +174,9 @@ private:
 		case 'V': return 5;
 		case 'X': return 10;
 		case 'L': return 50;
-		case 'C':return 100;
-		case 'D':return 500;
-		case 'M':return 1000;
+		case 'C': return 100;
+		case 'D': return 500;
+		case 'M': return 1000;
 
 		default:
 			throw "bad things one size romans func";
@@ -280,12 +184,34 @@ private:
 		}
 	}
 
-	std::string processToRoman(int value, std::map<int, std::string>& mapRef)
+	std::string processToRoman(int value)
 	{
-		// if cannot access romanstr in map with key, throws which is good
-		// shuldnt be happening tho
-		std::string s = mapRef.at(value);
-		return s;
+		using namespace std;
+
+		switch (value)
+		{
+		case 1000: return string{ "M" }; break;
+		case 900:  return string{ "CM" }; break;
+		case 500:  return string{ "D" }; break;
+		case 400:  return string{ "CD" }; break;
+		case 100:  return string{ "C" }; break;
+		case 90:  return string{ "XC" }; break;
+		case 50:  return string{ "L" }; break;
+		case 40:  return string{ "XL" }; break;
+		case 10:  return string{ "X" }; break;
+		case 9:  return string{ "IX" }; break;
+		case 8:  return string{ "VIII" }; break;
+		case 7:  return string{ "VII" }; break;
+		case 6:  return string{ "VI" }; break;
+		case 5:  return string{ "V" }; break;
+		case 4:  return string{ "IV" }; break;
+		case 3:  return string{ "III" }; break;
+		case 2:  return string{ "II" }; break;
+		case 1:  return string{ "I" }; break;
+		default:
+			throw "something went bad in process to roman func";
+			break;
+		}
 	}
 };
 
